@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 
 namespace FoodApi {
     public class Startup {
@@ -26,17 +25,21 @@ namespace FoodApi {
         public void ConfigureServices (IServiceCollection services) {
 
             //Config
-            var cfgBuilder = new ConfigurationBuilder ()
-                .SetBasePath (env.ContentRootPath)
-                .AddJsonFile ("appsettings.json");
+            var cfgBuilder = new ConfigurationBuilder ();
             var configuration = cfgBuilder.Build ();
-            services.Configure<AppConfig> (configuration);
-            services.AddSingleton (typeof (IConfigurationRoot), configuration);
+
+
+
+            //     .SetBasePath (env.ContentRootPath)
+            //     .AddJsonFile ("appsettings.json");
+            // var configuration = cfgBuilder.Build ();
+            // services.AddSingleton (typeof (IConfigurationRoot), configuration);
 
             //Use MI to get DB Con Str
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-            var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-            string dbconstring = (kv.GetSecretAsync("https://foodvault-013.vault.azure.net/", "DBConnection").Result).Value;
+            // var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            // var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            // string dbconstring = (kv.GetSecretAsync("https://foodvault-013.vault.azure.net/", "DBConnection").Result).Value;
+            var dbconstring = "";
 
             //EF
             //We dont need the conStrLite anymore - just there for comparison
@@ -44,7 +47,7 @@ namespace FoodApi {
             services.AddEntityFrameworkSqlite ().AddDbContext<FoodDBContext> (options => options.UseSqlite (dbconstring));
 
             //AI
-            services.AddApplicationInsightsTelemetry (Configuration["Azure:ApplicationInsights:InstrumentationKey"]);
+            // services.AddApplicationInsightsTelemetry (Configuration["Azure:ApplicationInsights:InstrumentationKey"]);
 
             //Swagger
             services.AddSwaggerGen (c => {
